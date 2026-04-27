@@ -1,0 +1,61 @@
+trajectory-porkchop-generator/
+│
+├── .github/                             # Automated CI/CD pipelines
+│   └── workflows/
+│       ├── test-lambert.yml             # Unit tests for the Lambert solver and orbital math
+│       └── build-compute.yml
+│
+├── compute_engine/                      # Go or C++: High-Performance Astrodynamics Engine
+│   ├── cmd/
+│   │   └── solver/
+│   │       └── main.go                  # gRPC server listening for matrix compute requests
+│   ├── internal/
+│   │   ├── ephemeris/
+│   │   │   └── jpl_spice.go             # Parses NASA JPL SPICE kernels to get exact planetary positions
+│   │   ├── orbital_math/
+│   │   │   ├── kepler.go                # Solves Kepler's equations for state vectors
+│   │   │   └── lambert.go               # THE CORE MATH: Izzo's algorithm for Lambert's problem
+│   │   └── matrix/
+│   │       └── grid_runner.go           # Parallelizes 10,000+ Lambert solutions for a date range
+│   ├── go.mod
+│   └── Dockerfile                       # CPU-optimized build for maximum multi-threading
+│
+├── api_gateway/                         # Python + FastAPI: Client API and Caching
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── routes/
+│   │   │       ├── porkchop.py          # Endpoint: Request a $\Delta v$ contour map
+│   │   │       └── trajectory.py        # Endpoint: Request a specific 3D flight path array
+│   │   ├── core/
+│   │   │   └── redis_cache.py           # Caches massive matrix results so the UI loads instantly
+│   │   └── main.py
+│   ├── requirements.txt                 # Includes fastapi, redis, numpy
+│   └── Dockerfile
+│
+├── mission_planner_ui/                  # React + TypeScript: The Trajectory Visualizer
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── PorkchopPlot.tsx         # Uses D3.js or Plotly to render the contour map heatmap
+│   │   │   ├── SolarSystem3D.tsx        # Three.js WebGL canvas to draw planets and the transfer orbit
+│   │   │   ├── DeltaVMetrics.tsx        # HUD showing C3 energy, Departure $V_\infty$, and Arrival $V_\infty$
+│   │   │   └── DateSelector.tsx         # Calendar inputs for Departure and Arrival windows
+│   │   ├── hooks/
+│   │   │   └── useTrajectoryData.ts     # Fetches grid data and specific path vectors
+│   │   ├── App.tsx
+│   │   └── index.tsx
+│   ├── package.json                     # Needs d3-contour, three, @react-three/fiber
+│   └── Dockerfile
+│
+├── infrastructure/                      # Deployment Orchestration
+│   ├── redis.yaml                       # Crucial for caching the heavy matrix computations
+│   ├── compute-nodes.yaml               # Kubernetes deployment to scale the Go engine
+│   ├── api-gateway.yaml
+│   └── ingress.yaml
+│
+├── docker-compose.yml                   # Boots the Go solver, Python API, and React UI locally
+├── Makefile
+└── README.md
+
+
+
+
