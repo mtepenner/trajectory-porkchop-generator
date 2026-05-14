@@ -1,0 +1,32 @@
+version: '3.9'
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  compute_engine:
+    build: ./compute_engine
+    ports:
+      - "50051:50051"
+    restart: unless-stopped
+
+  api_gateway:
+    build: ./api_gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - COMPUTE_ENGINE_ADDR=compute_engine:50051
+    depends_on:
+      - redis
+      - compute_engine
+
+  mission_planner_ui:
+    build: ./mission_planner_ui
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    depends_on:
+      - api_gateway

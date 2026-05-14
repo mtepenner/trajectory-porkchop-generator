@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: compute-engine
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: compute-engine
+  template:
+    metadata:
+      labels:
+        app: compute-engine
+    spec:
+      containers:
+        - name: compute-engine
+          image: ghcr.io/mtepenner/trajectory-porkchop-generator/compute-engine:latest
+          ports:
+            - containerPort: 50051
+          resources:
+            requests:
+              cpu: "2"
+              memory: 512Mi
+            limits:
+              cpu: "8"
+              memory: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: compute-engine
+spec:
+  selector:
+    app: compute-engine
+  ports:
+    - port: 50051
+      targetPort: 50051

@@ -1,0 +1,21 @@
+name: Test Lambert Solver
+
+on:
+  push:
+    paths:
+      - 'compute_engine/**'
+  pull_request:
+    paths:
+      - 'compute_engine/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      - name: Run Lambert tests
+        working-directory: compute_engine
+        run: go test ./internal/orbital_math/... -v
