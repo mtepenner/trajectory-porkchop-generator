@@ -97,7 +97,6 @@ func izzo_x0(lambda, T float64) float64 {
 }
 
 func izzo_tof_derivatives(x, T, lambda2 float64) (float64, float64, float64) {
-	a := 1.0 / (1 - x*x)
 	xabs := math.Abs(x)
 	var xi, eta, S1 float64
 	if xabs < 1 {
